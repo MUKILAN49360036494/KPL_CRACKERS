@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KPL Crackers | Celebrate Every Moment</title>
+  <meta name="description" content="KPL Crackers - fireworks, crackers, gift boxes and Diwali specials.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="shop">
+<header class="topbar">
+  <div class="container topbar-inner">
+    <div>☎ +91 7538837392</div>
+    <div class="toplinks"><span>Safe</span><b>•</b><span>Quality</span><b>•</b><span>Bright Celebrations</span></div>
+    <div>
+      <a href="#cart" class="topbar-cart-link">🛒 Cart (<span id="cartCountTop">0</span>) • <span id="cartSubtotalTop">₹0</span></a>
+    </div>
+  </div>
+</header>
+
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.svg" alt="KPL Crackers">
+    </a>
+    <button class="mobile-menu" id="mobileMenuBtn" aria-label="Menu">☰</button>
+    <div class="navlinks" id="navlinks">
+      <a class="active" href="index.html">Home</a>
+      <a href="#products">Products</a>
+      <a href="#about">About Us</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="searchbox">
+      <input id="searchInput" type="search" placeholder="Search for crackers...">
+      <button id="searchBtn">⌕</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section class="hero">
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <div>
+        <div class="hero-kicker">KPL CRACKERS</div>
+        <h1>Celebrate Every Moment<br>With Joy</h1>
+        <p>More Colours • More Happiness</p>
+        <a href="#products" class="btn btn-primary">Shop Products</a>
+      </div>
+      <div class="fireworks-art" aria-hidden="true">✦ ✧ ✹ ✦</div>
+    </div>
+  </section>
+
+  <section class="section" id="products">
+    <div class="container">
+      <div class="section-title"><span>✺</span><h2>Our Products</h2><span>✺</span></div>
+      <div class="category-row" id="categoryRow"></div>
+      <div class="product-grid" id="productGrid"></div>
+      <div id="emptyState" class="empty hidden">No products found. Add products from the Admin page.</div>
+    </div>
+  </section>
+
+  <section class="trust-strip">
+    <div class="container trust-grid">
+      <div><span class="trust-icon">🛡</span><b>Safe & Certified</b><small>Quality Products</small></div>
+      <div><span class="trust-icon">✓</span><b>Best Quality</b><small>Crackers</small></div>
+      <div><span class="trust-icon">🚚</span><b>Fast & Reliable</b><small>Delivery</small></div>
+      <div><span class="trust-icon">₹</span><b>Best Prices</b><small>Guaranteed</small></div>
+      <div><span class="trust-icon">☎</span><b>24/7 Customer</b><small>Support</small></div>
+    </div>
+  </section>
+
+  <section class="cta-banner">
+    <div class="container cta-inner">
+      <div><small>This Diwali</small><h2>Make It Special<br>With <strong>KPL CRACKERS</strong></h2></div>
+      <div class="cta-box">🎁<br><span>Crackers & Gift Packs</span></div>
+      <div><a href="#products" class="btn btn-yellow">Order Now<br><small>and Light Up Your Celebrations</small></a></div>
+    </div>
+  </section>
+
+  <section class="about section" id="about">
+    <div class="container about-grid">
+      <div>
+        <div class="eyebrow">ABOUT KPL</div>
+        <h2>Bright celebrations, made simple.</h2>
+        <p>Browse products, choose quantities up to 10 per item, review your cart and generate a ready-to-share invoice for WhatsApp.</p>
+      </div>
+      <div class="about-card"><b>Need help?</b><br>Call <a href="tel:+917538837392">+91 7538837392</a><br>We are happy to help with your order.</div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="container footer-grid">
+    <div><img src="assets/logo.svg" class="footer-logo" alt="KPL Crackers"><p>Celebrate Every Moment With Joy</p></div>
+    <div><h3>Quick Links</h3><a href="index.html">Home</a><a href="#products">Products</a><a href="#about">About Us</a><a href="#contact">Contact</a></div>
+    <div><h3>Contact Us</h3><p>☎ +91 7538837392</p><p>📍 Karaikudi, Tamil Nadu</p><p>✉ kplcrackers@gmail.com</p></div>
+    <div>
+      <h3>Follow Us</h3>
+      <div class="socials">
+        <a href="https://www.facebook.com" target="_blank" rel="noopener" title="Facebook">f</a>
+        <a href="https://www.instagram.com" target="_blank" rel="noopener" title="Instagram">◎</a>
+        <a href="https://www.youtube.com" target="_blank" rel="noopener" title="YouTube">▶</a>
+      </div>
+    </div>
+  </div>
+  <div class="copyright">
+    <span>© 2025 KPL CRACKERS. All Rights Reserved.</span>
+    <span class="company-tag">Focus4 Product and Service based company</span>
+  </div>
+</footer>
+
+<div class="cart-drawer" id="cartDrawer" aria-hidden="true">
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer">
+    <div class="drawer-head"><h2>Your Cart</h2><button id="closeCart">×</button></div>
+    <div id="cartItems"></div>
+    <div class="cart-summary">
+      <div><span>Total Items</span><b id="cartItemsCount">0</b></div>
+      <div class="total"><span>Subtotal Amount</span><b id="cartTotal">₹0</b></div>
+      <button class="btn btn-primary full" id="checkoutBtn">Order Now & Generate Bill</button>
+      <button class="btn btn-yellow full" id="addMoreProductsBtn">➕ Add More Products</button>
+      <button class="btn btn-outline full" id="clearCartBtn">Clear Cart</button>
+    </div>
+  </aside>
+</div>
+
+<div id="stickyCartBar" class="sticky-cart-bar hidden">
+  <div class="container sticky-cart-inner">
+    <div class="sticky-cart-info">
+      <span>Total: <strong id="stickyCartTotal">₹0</strong></span>
+      <small>(<span id="stickyCartCount">0</span> items selected)</small>
+    </div>
+    <button class="btn btn-primary" id="stickyViewCart">🛒 View Cart / Order Now</button>
+  </div>
+</div>
+
+<div class="modal hidden" id="invoiceModal">
+  <div class="modal-card invoice-card">
+    <button class="modal-close" id="closeInvoice">×</button>
+    <div class="customer-info-form styled-cust-form">
+      <h3>👤 Customer Information <small class="req-star">*Required to send invoice</small></h3>
+      <div class="form-2">
+        <div class="input-group">
+          <label for="custName">Full Name *</label>
+          <input type="text" id="custName" placeholder="Enter your name (e.g. Ramesh)" required>
+        </div>
+        <div class="input-group">
+          <label for="custPhone">Mobile Number *</label>
+          <input type="tel" id="custPhone" placeholder="Enter 10-digit mobile number" maxlength="10" required>
+        </div>
+      </div>
+      <div id="custFormError" class="cust-error-msg hidden">⚠️ Please enter your Full Name and a valid 10-digit Mobile Number.</div>
+    </div>
+    <div id="invoiceContent"></div>
+    <div class="invoice-actions">
+      <button class="btn btn-primary" type="button" id="downloadPdfBtn">📄 Download PDF Bill</button>
+      <button class="btn btn-outline" type="button" id="printInvoice">🖨️ Print / Save PDF</button>
+      <button class="btn btn-whatsapp full" type="button" id="sendWhatsapp">Send Invoice on WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KPL Crackers | Admin</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="admin">
+<header class="admin-head">
+  <div class="container admin-head-inner">
+    <a class="brand" href="index.html"><img src="assets/logo.svg" alt="KPL Crackers"></a>
+    <div class="admin-nav-actions">
+      <button id="adminLogoutBtn" class="btn btn-outline hidden">Logout 🔒</button>
+      <a class="btn btn-light" href="index.html">← Main Website</a>
+    </div>
+  </div>
+</header>
+
+<!-- Secure Admin Login Overlay -->
+<!-- Secure Admin Login Overlay -->
+<div id="adminLoginOverlay" class="admin-login-overlay">
+  <div class="login-card">
+    <div class="login-badge">🛡️ SECURE ADMIN PORTAL</div>
+    <div class="login-brand">
+      <img src="assets/logo.svg" alt="KPL Crackers" class="login-logo">
+      <h2>Control Panel Login</h2>
+      <p>Authorized administrator authentication required.</p>
+    </div>
+    <form id="adminLoginForm" class="login-form">
+      <div class="login-input-group">
+        <label for="loginUserId">👤 User ID</label>
+        <input type="text" id="loginUserId" placeholder="Enter User ID (e.g. KPLCRACKERS)" required autocomplete="username">
+      </div>
+      <div class="login-input-group">
+        <label for="loginPassword">🔑 Password</label>
+        <div class="password-input-wrapper">
+          <input type="password" id="loginPassword" placeholder="Enter Password" required autocomplete="current-password">
+          <button type="button" id="togglePasswordBtn" class="toggle-pass-btn" title="Show / Hide Password">👁️</button>
+        </div>
+      </div>
+      <div id="loginErrorMsg" class="login-error hidden">❌ Invalid User ID or Password. Please try again.</div>
+      <button type="submit" class="btn btn-primary full btn-login">Login to Dashboard 🔒</button>
+    </form>
+    <div class="login-footer-security">
+      <span>🔒 256-Bit Cryptographic Hash Protection</span>
+    </div>
+  </div>
+</div>
+
+<main class="admin-page hidden" id="adminMainContent">
+  <div class="container">
+    <div class="admin-title">
+      <div><div class="eyebrow">CONTROL PANEL</div><h1>Product Admin</h1><p>Products added here are immediately shown on the main page on this browser/device.</p></div>
+      <div class="admin-stats"><div><b id="statProducts">0</b><small>Products</small></div><div><b id="statCategories">0</b><small>Categories</small></div></div>
+    </div>
+
+    <div class="admin-grid">
+      <section class="admin-card">
+        <div class="card-head"><h2 id="formTitle">Add Product</h2><button id="resetForm" class="text-btn">Reset</button></div>
+        <form id="productForm">
+          <input type="hidden" id="productId">
+          <label>Product Name<input id="productName" required placeholder="e.g. Spin Master Mini Red & Green"></label>
+          <div class="form-2">
+            <label>Price per piece/box (₹)<input id="productPrice" required type="number" min="0" step="0.01" placeholder="65"></label>
+            <label>Quantity / Pack Info<input id="productQuantity" placeholder="e.g. 1 Box - 10 pcs"></label>
+          </div>
+          <div class="form-2">
+            <label>Category<input id="productCategory" required placeholder="Ground Chakkars"></label>
+            <label>Display Order<input id="productOrder" type="number" min="0" value="0"></label>
+          </div>
+          <label>Upload Image File<input id="productImageFile" type="file" accept="image/*"></label>
+          <label>OR Image URL<input id="productImage" placeholder="https://.../product.jpg"></label>
+          <div id="imagePreviewContainer" class="image-preview-box hidden"><img id="imagePreview" src="" alt="Preview"></div>
+          <label>Short Description<textarea id="productDescription" rows="2" placeholder="High quality crackling fountain"></textarea></label>
+          <button class="btn btn-primary full" type="submit" id="saveProductBtn">Add Product</button>
+        </form>
+        <div class="admin-note">Tip: You can upload an image file directly from your device or paste an image URL.</div>
+      </section>
+
+      <section class="admin-card">
+        <div class="card-head"><h2>Products</h2><button id="seedProducts" class="text-btn">Load Sample Products</button></div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Image</th><th>Product</th><th>Category</th><th>Price / Pc</th><th>Pack Qty</th><th>Actions</th></tr></thead>
+            <tbody id="adminProductList"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="admin-card order-admin">
+      <div class="card-head"><h2>Recent Orders</h2><button id="clearOrders" class="text-btn danger">Clear All Orders</button></div>
+      <div id="ordersList" class="orders-list"></div>
+    </section>
+  </div>
+</main>
+
+<!-- View Order Invoice Modal for Admin -->
+<div class="modal hidden" id="adminOrderModal">
+  <div class="modal-card invoice-card">
+    <button class="modal-close" id="closeAdminOrderModal">×</button>
+    <div id="adminOrderInvoiceContent"></div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal hidden" id="deleteConfirmModal">
+  <div class="modal-card confirm-modal-card">
+    <h3>⚠️ Confirm Delete Order</h3>
+    <p>Are you sure you want to delete this order? This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn">Confirm Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
