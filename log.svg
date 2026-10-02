@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#ffdf00"/><stop offset="1" stop-color="#ff8a00"/></linearGradient></defs>
+<g transform="translate(10,8)">
+<circle cx="55" cy="38" r="32" fill="#ffdf00" opacity=".18"/><path d="M48 5l9 26 19-19-7 30" fill="none" stroke="#ffdf00" stroke-width="6"/>
+<path d="M245 12l20-8-7 20 22 5-21 8 7 20-18-13-15 18 3-23-23-6 23-5z" fill="#f11"/>
+<text x="8" y="92" font-family="Arial Black,Arial" font-size="76" font-style="italic" font-weight="900" fill="url(#g)" stroke="#09224b" stroke-width="7" paint-order="stroke">KPL</text>
+<text x="45" y="137" font-family="Arial Black,Arial" font-size="42" font-weight="900" fill="#fff" stroke="#ed1830" stroke-width="7" paint-order="stroke">CRACKERS</text>
+<path d="M300 38c12-22 33-23 46-9-18 5-29 16-32 34" fill="none" stroke="#1ea7ff" stroke-width="6"/>
+</g></svg>
