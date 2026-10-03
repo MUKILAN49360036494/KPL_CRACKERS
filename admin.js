@@ -1,12 +1,4 @@
-const STORE_PRODUCTS="kpl_products_v1", STORE_ORDERS="kpl_orders_v1", AUTH_KEY="kpl_admin_session_auth";
-
-// Precomputed SHA-256 hashes of "USER_ID:PASSWORD" for encrypted security
-// User 1: KPLCRACKERS / @KPL4!
-// User 2: MUKILAN4 / M4@F4V
-const ENCRYPTED_AUTH_HASHES=[
- "8dfc6d9670eb8972ec226bb872658efdf3cbe54020a45eb578ca5e100fce9d34",
- "e00fbffcf35ed2bd06a72e8e50bdf60cbdf077bdfd9db3ebc69f23497d391aa5"
-];
+const STORE_ORDERS="kpl_orders_v1";
 
 const SAMPLE_PRODUCTS=[
  {id:"p1",name:"Spin Master Mini Red & Green",price:65,quantity:"1 Box - 10 pcs",category:"Ground Chakkars",image:"",description:"1 Box - 10 pcs",order:1},
@@ -19,9 +11,10 @@ const SAMPLE_PRODUCTS=[
  {id:"p8",name:"Special Combo Pack",price:999,quantity:"1 Combo Pack",category:"Special Combo Packs",image:"",description:"Festival combo",order:8}
 ];
 
-let products=load(STORE_PRODUCTS,SAMPLE_PRODUCTS);
+let products=[];
 let currentBase64Image="";
 let orderIdToDelete=null;
+let productsChannel=null;
 
 function load(k,f){try{const x=localStorage.getItem(k);return x?JSON.parse(x):f}catch(e){return f}}
 function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
@@ -29,40 +22,45 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&l
 function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2})}
 function refreshStats(){document.getElementById("statProducts").textContent=products.length;document.getElementById("statCategories").textContent=new Set(products.map(p=>p.category)).size}
 
-// Cryptographic SHA-256 Hashing helper
-async function sha256(str){
- if(window.crypto && crypto.subtle){
-  const buffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
- }
- // Fallback hash function
- let hash = 0;
- for (let i = 0; i < str.length; i++) {
-  hash = ((hash << 5) - hash) + str.charCodeAt(i);
-  hash |= 0;
- }
- return hash.toString();
-}
-
-let failedAttempts = 0;
-let lockoutTimer = null;
-
-function checkAuthSession(){
- const isAuth = sessionStorage.getItem(AUTH_KEY);
+async function checkAuthSession(){
+ const {data,error}=await window.KPLSupabase.auth.getSession();
+ if(error)throw error;
+ const session=data.session;
  const loginOverlay = document.getElementById("adminLoginOverlay");
  const mainContent = document.getElementById("adminMainContent");
  const logoutBtn = document.getElementById("adminLogoutBtn");
 
- if(isAuth === "true"){
+ if(session && session.user.app_metadata?.role==="admin"){
   if(loginOverlay) loginOverlay.classList.add("hidden");
   if(mainContent) mainContent.classList.remove("hidden");
   if(logoutBtn) logoutBtn.classList.remove("hidden");
+  await loadProducts();
   renderAll();
+  if(productsChannel)window.KPLSupabase.removeChannel(productsChannel);
+  productsChannel=window.KPLSupabase.channel("admin-products")
+   .on("postgres_changes",{event:"*",schema:"public",table:"products"},()=>{
+    loadProducts().then(renderAll).catch(error=>{
+     console.error("Could not refresh admin products:",error);
+    });
+   })
+   .subscribe();
  }else{
+  if(session) await window.KPLSupabase.auth.signOut();
   if(loginOverlay) loginOverlay.classList.remove("hidden");
   if(mainContent) mainContent.classList.add("hidden");
   if(logoutBtn) logoutBtn.classList.add("hidden");
+  if(session){
+   const errBox=document.getElementById("loginErrorMsg");
+   errBox.textContent="This account is not authorized as an administrator.";
+   errBox.classList.remove("hidden");
+  }
  }
+}
+
+async function loadProducts(){
+ const {data,error}=await window.KPLSupabase.from("products").select("*").order("sort_order");
+ if(error)throw error;
+ products=data.map(p=>({...p,order:p.sort_order}));
 }
 
 async function handleAdminLogin(e){
@@ -70,56 +68,31 @@ async function handleAdminLogin(e){
 
  const errBox = document.getElementById("loginErrorMsg");
  const submitBtn = e.target.querySelector("button[type='submit']");
-
- if(failedAttempts >= 5){
+ submitBtn.disabled=true;
+ try{
+  const {error}=await window.KPLSupabase.auth.signInWithPassword({
+   email:document.getElementById("loginUserId").value.trim(),
+   password:document.getElementById("loginPassword").value
+  });
+  if(error)throw error;
+  if(errBox)errBox.classList.add("hidden");
+  document.getElementById("adminLoginForm").reset();
+  await checkAuthSession();
+ }catch(error){
   if(errBox){
-   errBox.textContent = "⚠️ Too many failed attempts. Locked out for 30 seconds for security.";
+   errBox.textContent=error.message||"Login failed. Check your email and password.";
    errBox.classList.remove("hidden");
   }
-  return;
- }
-
- const uId = document.getElementById("loginUserId")?.value.trim() || "";
- const uPass = document.getElementById("loginPassword")?.value.trim() || "";
-
- const combo = `${uId.toUpperCase()}:${uPass}`;
- const hash = await sha256(combo);
-
- const isUser1 = (uId.toUpperCase() === "KPLCRACKERS" && uPass === "@KPL4!");
- const isUser2 = (uId.toUpperCase() === "MUKILAN4" && uPass === "M4@F4V");
- const isValidHash = ENCRYPTED_AUTH_HASHES.includes(hash);
-
- if(isValidHash || isUser1 || isUser2){
-  failedAttempts = 0;
-  sessionStorage.setItem(AUTH_KEY, "true");
-  if(errBox) errBox.classList.add("hidden");
-  document.getElementById("adminLoginForm").reset();
-  checkAuthSession();
- }else{
-  failedAttempts++;
-  if(failedAttempts >= 5){
-   if(errBox){
-    errBox.textContent = "🚫 Security Alert: 5 failed attempts! Locked out for 30 seconds.";
-    errBox.classList.remove("hidden");
-   }
-   if(submitBtn) submitBtn.disabled = true;
-   lockoutTimer = setTimeout(() => {
-    failedAttempts = 0;
-    if(submitBtn) submitBtn.disabled = false;
-    if(errBox) errBox.classList.add("hidden");
-   }, 30000);
-  }else{
-   if(errBox){
-    errBox.textContent = `❌ Invalid User ID or Password. (${5 - failedAttempts} attempts remaining)`;
-    errBox.classList.remove("hidden");
-   }
-  }
+ }finally{
+  submitBtn.disabled=false;
  }
 }
 
-function handleAdminLogout(){
- sessionStorage.removeItem(AUTH_KEY);
- checkAuthSession();
+async function handleAdminLogout(){
+ const {error}=await window.KPLSupabase.auth.signOut();
+ if(error)throw error;
+ if(productsChannel)window.KPLSupabase.removeChannel(productsChannel);
+ await checkAuthSession();
 }
 
 function updateImagePreview(src){
@@ -172,7 +145,13 @@ function editProduct(id){
 
 function deleteProduct(id){
  const p=products.find(x=>x.id===id);if(!p)return;
- if(confirm(`Delete "${p.name}"?`)){products=products.filter(x=>x.id!==id);save(STORE_PRODUCTS,products);renderAll()}
+ if(confirm(`Delete "${p.name}"?`)){
+  window.KPLSupabase.from("products").delete().eq("id",id).then(async({error})=>{
+   if(error)throw error;
+   await loadProducts();
+   renderAll();
+  }).catch(error=>alert(`Could not delete product: ${error.message}`));
+ }
 }
 
 function renderOrders(){
@@ -275,9 +254,12 @@ function confirmDeleteOrder(){
 function renderAll(){refreshStats();renderProducts();renderOrders()}
 
 document.addEventListener("DOMContentLoaded",()=>{
- document.getElementById("productOrder").value=products.length+1;
- checkAuthSession();
- window.addEventListener("storage", renderAll);
+ checkAuthSession().catch(error=>{
+  console.error("Could not initialize admin:",error);
+  const errBox=document.getElementById("loginErrorMsg");
+  errBox.textContent=`Could not connect to the product database: ${error.message}`;
+  errBox.classList.remove("hidden");
+ });
 
  const loginForm=document.getElementById("adminLoginForm");
  if(loginForm) loginForm.onsubmit=handleAdminLogin;
@@ -297,7 +279,9 @@ document.addEventListener("DOMContentLoaded",()=>{
  }
 
  const logoutBtn=document.getElementById("adminLogoutBtn");
- if(logoutBtn) logoutBtn.onclick=handleAdminLogout;
+ if(logoutBtn) logoutBtn.onclick=()=>handleAdminLogout().catch(error=>{
+  alert(`Could not log out: ${error.message}`);
+ });
 
  const fileInput=document.getElementById("productImageFile");
  const urlInput=document.getElementById("productImage");
@@ -343,15 +327,34 @@ document.addEventListener("DOMContentLoaded",()=>{
    order:Number(document.getElementById("productOrder").value)||0
   };
   const idx=products.findIndex(p=>p.id===id);
-  if(idx>=0)products[idx]=item;else products.push(item);
-  save(STORE_PRODUCTS,products);
-  resetForm();
-  renderAll();
-  alert(idx>=0?"Product updated successfully!":"Product added successfully!");
+  const row={...item,sort_order:item.order};
+  delete row.order;
+  const saveButton=document.getElementById("saveProductBtn");
+  saveButton.disabled=true;
+  window.KPLSupabase.from("products").upsert(row).then(async({error})=>{
+   if(error)throw error;
+   await loadProducts();
+   resetForm();
+   renderAll();
+   alert(idx>=0?"Product updated successfully!":"Product added successfully!");
+  }).catch(error=>alert(`Could not save product: ${error.message}`)).finally(()=>{
+   saveButton.disabled=false;
+  });
  };
 
  document.getElementById("resetForm").onclick=resetForm;
- document.getElementById("seedProducts").onclick=()=>{if(confirm("Load sample products? This will replace your current product list.")){products=SAMPLE_PRODUCTS;save(STORE_PRODUCTS,products);renderAll()}};
+ document.getElementById("seedProducts").onclick=async()=>{
+  if(!confirm("Load sample products? This will add or update the sample products."))return;
+  try{
+   const rows=SAMPLE_PRODUCTS.map(({order,...p})=>({...p,sort_order:order}));
+   const {error}=await window.KPLSupabase.from("products").upsert(rows);
+   if(error)throw error;
+   await loadProducts();
+   renderAll();
+  }catch(error){
+   alert(`Could not load sample products: ${error.message}`);
+  }
+ };
  document.getElementById("clearOrders").onclick=()=>{
   orderIdToDelete="ALL";
   document.getElementById("deleteConfirmModal").classList.remove("hidden");

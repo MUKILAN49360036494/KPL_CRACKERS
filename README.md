@@ -8,6 +8,8 @@ A complete responsive storefront + admin page based on the reference screenshots
 - `styles.css` — responsive design
 - `app.js` — cart, quantity limit, invoice and WhatsApp
 - `admin.js` — add/edit/delete products and recent orders
+- `supabase-config.js` — Supabase project URL and publishable key
+- `supabase-schema.sql` — products table, sample products, realtime, and row-level security
 - `assets/logo.svg` — KPL-style logo
 
 ## Features
@@ -26,7 +28,20 @@ A complete responsive storefront + admin page based on the reference screenshots
 ## Run
 For a quick test, open `index.html` in a browser. For best results, serve the folder with a simple web server, e.g. VS Code Live Server.
 
-## Important for production
-This version uses browser `localStorage`, so Admin and Main Page are connected when used in the same browser/device. It is a complete working prototype, but a real public website needs a backend/database so that products added by an administrator are visible to customers on other phones/computers.
+## Supabase setup
+1. In the Supabase SQL Editor, run `supabase-schema.sql`.
+2. In Authentication settings, disable public sign-ups, then create an admin user with an email and password.
+3. In the SQL Editor, assign that user's admin role, replacing the email:
 
-For production deployment, the next step is to connect the same UI to a database/API and add secure admin login. The WhatsApp number is already set to +91 7538837392.
+   ```sql
+   update auth.users
+   set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"admin"}'::jsonb
+   where email = 'admin@example.com';
+   ```
+
+4. Sign out and back in on `admin.html` so the new role is included in the session.
+5. Deploy the site over HTTPS (for example, with GitHub Pages). Products are shared through Supabase and changes are delivered to open storefronts in real time.
+
+`supabase-config.js` contains the project's public publishable key, which is intended for browser use. Never put a Supabase secret or `service_role` key in the website. Product reads are public; product writes require Supabase authentication and the server-controlled `admin` role enforced by row-level security.
+
+Cart and recent-order data still use browser `localStorage`; only product data is shared through Supabase. For best results, serve the folder through a web server rather than opening HTML files directly. The WhatsApp number is +91 7538837392.

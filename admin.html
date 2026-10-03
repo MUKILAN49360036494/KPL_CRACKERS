@@ -30,7 +30,7 @@
     <form id="adminLoginForm" class="login-form">
       <div class="login-input-group">
         <label for="loginUserId">👤 User ID</label>
-        <input type="text" id="loginUserId" placeholder="Enter User ID (e.g. KPLCRACKERS)" required autocomplete="username">
+        <input type="email" id="loginUserId" placeholder="Admin email address" required autocomplete="username">
       </div>
       <div class="login-input-group">
         <label for="loginPassword">🔑 Password</label>
@@ -43,7 +43,7 @@
       <button type="submit" class="btn btn-primary full btn-login">Login to Dashboard 🔒</button>
     </form>
     <div class="login-footer-security">
-      <span>🔒 256-Bit Cryptographic Hash Protection</span>
+      <span>🔒 Secure Supabase authentication</span>
     </div>
   </div>
 </div>
@@ -51,7 +51,7 @@
 <main class="admin-page hidden" id="adminMainContent">
   <div class="container">
     <div class="admin-title">
-      <div><div class="eyebrow">CONTROL PANEL</div><h1>Product Admin</h1><p>Products added here are immediately shown on the main page on this browser/device.</p></div>
+      <div><div class="eyebrow">CONTROL PANEL</div><h1>Product Admin</h1><p>Products are saved online and shown to every website visitor.</p></div>
       <div class="admin-stats"><div><b id="statProducts">0</b><small>Products</small></div><div><b id="statCategories">0</b><small>Categories</small></div></div>
     </div>
 
@@ -116,6 +116,8 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="admin.js"></script>
 </body>
 </html>

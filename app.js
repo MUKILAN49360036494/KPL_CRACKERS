@@ -1,17 +1,7 @@
-const STORE_PRODUCTS="kpl_products_v1", STORE_CART="kpl_cart_v1", STORE_ORDERS="kpl_orders_v1";
+const STORE_CART="kpl_cart_v1", STORE_ORDERS="kpl_orders_v1";
 const WA_NUMBER="917538837392";
-const SAMPLE_PRODUCTS=[
- {id:"p1",name:"Spin Master Mini Red & Green",price:65,quantity:"1 Box - 10 pcs",category:"Ground Chakkars",image:"",description:"1 Box - 10 pcs",order:1},
- {id:"p2",name:"Spin Master Max Red & Green",price:124,quantity:"1 Box - 10 pcs",category:"Ground Chakkars",image:"",description:"1 Box - 10 pcs",order:2},
- {id:"p3",name:'4" Elephant Lakshmi Dlx',price:180,quantity:"1 Pkt - 5 Pieces",category:"Crackers",image:"",description:"1 Pkt - 5 Pieces",order:3},
- {id:"p4",name:"Color Fountain",price:95,quantity:"1 Box - 5 pcs",category:"Fountains",image:"",description:"1 Box",order:4},
- {id:"p5",name:"Rocket Special",price:150,quantity:"1 Box - 10 pcs",category:"Rockets",image:"",description:"1 Box",order:5},
- {id:"p6",name:"Electric Sparklers",price:75,quantity:"1 Pkt - 10 pcs",category:"Sparklers",image:"",description:"10 pcs",order:6},
- {id:"p7",name:"Diwali Gift Box",price:499,quantity:"1 Box",category:"Gift Boxes",image:"",description:"Family celebration pack",order:7},
- {id:"p8",name:"Special Combo Pack",price:999,quantity:"1 Combo Pack",category:"Special Combo Packs",image:"",description:"Festival combo",order:8}
-];
 
-let products=load(STORE_PRODUCTS, SAMPLE_PRODUCTS), cart=load(STORE_CART,{}), activeCategory="All", searchTerm="";
+let products=[], cart=load(STORE_CART,{}), activeCategory="All", searchTerm="";
 
 function load(k,f){try{const x=localStorage.getItem(k);return x?JSON.parse(x):f}catch(e){return f}}
 function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
@@ -542,6 +532,36 @@ function renderAll(){
 document.addEventListener("DOMContentLoaded",()=>{
  renderAll();
  initHeroCanvas();
+ window.KPLSupabase.from("products")
+  .select("*")
+  .order("sort_order")
+  .then(({data,error})=>{
+   if(error)throw error;
+   document.getElementById("emptyState").textContent="No products found. Add products from the Admin page.";
+   products=data.map(p=>({...p,order:p.sort_order}));
+   renderAll();
+  })
+  .catch(error=>{
+   console.error("Could not load products from Supabase:",error);
+   const empty=document.getElementById("emptyState");
+   empty.textContent="Products are temporarily unavailable. Please try again later.";
+   empty.classList.remove("hidden");
+  });
+
+ window.KPLSupabase.channel("public-products")
+  .on("postgres_changes",{event:"*",schema:"public",table:"products"},()=>{
+   window.KPLSupabase.from("products")
+    .select("*")
+    .order("sort_order")
+    .then(({data,error})=>{
+     if(error)throw error;
+     document.getElementById("emptyState").textContent="No products found. Add products from the Admin page.";
+     products=data.map(p=>({...p,order:p.sort_order}));
+     renderAll();
+    })
+    .catch(error=>console.error("Could not refresh products:",error));
+  })
+  .subscribe();
 
  const nameInp=document.getElementById("custName");
  const phoneInp=document.getElementById("custPhone");
